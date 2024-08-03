@@ -20,6 +20,7 @@ import pyarrow as pa
 
 try:
     import tantivy
+    from tantivy import Query
 except ImportError:
     raise ImportError(
         "Please install tantivy-py `pip install tantivy` to use the full text search feature."  # noqa: E501
@@ -192,7 +193,8 @@ def search_index(
         and the second containing the scores
     """
     searcher = index.searcher()
-    query = index.parse_query(query)
+    schema = index.schema()
+    query = Query.fuzzy_term_query(schema, text=query)
     # get top results
     if ordering_field:
         results = searcher.search(query, limit, order_by_field=ordering_field)
